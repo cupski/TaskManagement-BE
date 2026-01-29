@@ -30,6 +30,12 @@ async def get_current_user(
     Raises:
         HTTPException: If token is invalid or user not found
     """
+
+    print("AUTH HEADER:", credentials)
+    print("TOKEN:", credentials.credentials)
+
+    print("User model module:", User.__module__)
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -59,6 +65,7 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     
+
     return user
 
 

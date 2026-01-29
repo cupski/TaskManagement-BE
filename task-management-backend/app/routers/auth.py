@@ -1,8 +1,6 @@
-# app/routers/auth.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from app.database import get_db
 from app.models import User
@@ -10,7 +8,6 @@ from app.schemas import (
     UserCreate,
     UserResponse,
     UserLogin,
-    Token,
     ApiResponse,
 )
 from app.utils.security import (
@@ -84,7 +81,12 @@ async def login(
     """
     # Get user by email
     result = await db.execute(
-        select(User).where(User.email == credentials.email)
+        select(User).where(
+            or_(
+                User.email == credentials.identifier,
+                User.username == credentials.identifier
+            )
+        )
     )
     user = result.scalar_one_or_none()
     

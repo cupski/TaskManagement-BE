@@ -37,7 +37,7 @@ class UserResponse(UserBase):
 
 class UserLogin(BaseModel):
     """Schema for user login"""
-    email: EmailStr
+    identifier: str = Field(..., description="Email or username")
     password: str
 
 

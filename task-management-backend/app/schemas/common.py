@@ -10,6 +10,7 @@ class ApiResponse(BaseModel, Generic[T]):
     """Generic API response wrapper"""
     success: bool = True
     data: T
+    message: str = "Operation successful"
 
 
 class ErrorResponse(BaseModel):

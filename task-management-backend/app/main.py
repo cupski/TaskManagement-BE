@@ -9,7 +9,7 @@ import time
 
 from app.config import settings
 from app.database import init_db, close_db
-from app.routers import auth, users
+from app.routers import auth, users, tasks
 
 
 @asynccontextmanager
@@ -41,35 +41,6 @@ async def lifespan(app: FastAPI):
 # Create FastAPI application
 app = FastAPI(
     title=settings.APP_NAME,
-    description="""
-    **Task Management API** with FastAPI and PostgreSQL
-    
-    ## Features
-    
-    * ✅ **Authentication** - JWT-based secure authentication
-    * ✅ **User Management** - Create and manage users
-    * ✅ **Task CRUD** - Complete task management
-    * ✅ **Advanced Filtering** - Filter tasks by status, assignee, deadline
-    * ✅ **Search** - Full-text search in tasks
-    * ✅ **Statistics** - Task analytics and metrics
-    * ✅ **AI Chatbot** - Natural language queries (Bonus Feature)
-    
-    ## Authentication
-    
-    Most endpoints require JWT token authentication.
-    
-    1. Register a new user: `POST /api/v1/auth/register`
-    2. Login: `POST /api/v1/auth/login` (returns JWT token)
-    3. Use token in Authorization header: `Authorization: Bearer <token>`
-    
-    ## Tech Stack
-    
-    - **Framework**: FastAPI
-    - **Database**: PostgreSQL with AsyncPG
-    - **ORM**: SQLAlchemy 2.0 (async)
-    - **Validation**: Pydantic V2
-    - **Authentication**: JWT with python-jose
-    """,
     version=settings.API_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -144,7 +115,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 # Include routers
 app.include_router(auth.router, prefix=f"/api/{settings.API_VERSION}")
 app.include_router(users.router, prefix=f"/api/{settings.API_VERSION}")
-
+app.include_router(tasks.router, prefix=f"/api/{settings.API_VERSION}")
 
 
 # Root endpoint

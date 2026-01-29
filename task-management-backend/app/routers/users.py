@@ -16,6 +16,7 @@ async def get_users(
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
     search: str = Query(None, description="Search by name or email"),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get list of all users (for assignee dropdown)
@@ -65,6 +66,7 @@ async def get_users(
 async def get_user_by_id(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get user by ID
