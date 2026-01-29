@@ -1,5 +1,3 @@
-# app/schemas/task.py
-
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from uuid import UUID
@@ -60,9 +58,7 @@ class TaskListResponse(BaseModel):
 
 class TaskStats(BaseModel):
     """Schema for task statistics"""
-    total_tasks: int
-    by_status: dict[str, int]
-    overdue_tasks: int
-    tasks_due_today: int
-    my_tasks: int
-    created_by_me: int
+    total: int
+    todo: int
+    in_progress: int
+    done: int

@@ -11,11 +11,9 @@ import uuid
 async def init_db():
     """Initialize database and create seed data"""
     
-    # Create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
-    # Create session
     async with AsyncSessionLocal() as session:
         # Check if users already exist
         result = await session.execute(select(User).limit(1))
@@ -46,6 +44,20 @@ async def init_db():
                 full_name="Mike Johnson",
                 password_hash=get_password_hash("password123"),
             ),
+            User(
+                id=uuid.uuid4(),
+                email="emily@example.com",
+                username="emily",
+                full_name="Emily Davis",
+                password_hash=get_password_hash("password123"),
+            ),
+            User(
+                id=uuid.uuid4(),
+                email="alex@example.com",
+                username="alex",
+                full_name="Alex Wilson",
+                password_hash=get_password_hash("password123"),
+            ),
         ]
         
         for user in users:
@@ -54,43 +66,48 @@ async def init_db():
         await session.commit()
         
         # Create demo tasks
-        for user in users:
-            tasks = [
-                Task(
+        statuses = (
+            [TaskStatus.TODO] * 4
+            + [TaskStatus.IN_PROGRESS] * 3
+            + [TaskStatus.DONE] * 3
+        )
+
+        now = datetime.now()
+
+        task_counter = 1
+
+        for idx, assignee in enumerate(users):
+            creator = users[(idx + 1) % len(users)]
+
+            for i, status in enumerate(statuses):
+                if status == TaskStatus.TODO:
+                    deadline = now + timedelta(days=3 + i)
+                elif status == TaskStatus.IN_PROGRESS:
+                    deadline = now + timedelta(days=1 + i)
+                else:  # DONE
+                    deadline = now - timedelta(days=1 + i)
+
+                task = Task(
                     id=uuid.uuid4(),
-                    title="Design Database Schema",
-                    description="Create comprehensive ERD showing relationships between users, tasks, and other entities. Include proper indexing strategy.",
-                    status=TaskStatus.TODO,
-                    deadline=datetime.now() + timedelta(days=3),
-                    assignee_id=user.id,
-                    created_by_id=users[0].id,
-                ),
-                Task(
-                    id=uuid.uuid4(),
-                    title="Implement API Endpoints",
-                    description="FastAPI CRUD operations for tasks and users. Include proper validation and error handling.",
-                    status=TaskStatus.IN_PROGRESS,
-                    deadline=datetime.now() + timedelta(days=5),
-                    assignee_id=user.id,
-                    created_by_id=users[0].id,
-                ),
-                Task(
-                    id=uuid.uuid4(),
-                    title="Setup Development Environment",
-                    description="Docker configuration, dependencies installation, and database setup.",
-                    status=TaskStatus.DONE,
-                    deadline=datetime.now() - timedelta(days=1),
-                    assignee_id=user.id,
-                    created_by_id=users[1].id,
-                ),
-            ]
-            
-            for task in tasks:
+                    title=f"Task {task_counter} for {assignee.full_name}",
+                    description=(
+                        f"This is demo task #{task_counter} assigned to "
+                        f"{assignee.full_name} with status {status.value}."
+                    ),
+                    status=status,
+                    deadline=deadline,
+                    assignee_id=assignee.id,
+                    created_by_id=creator.id,
+                )
+
                 session.add(task)
-        
+                task_counter += 1
+
         await session.commit()
+
         print("Database initialized with seed data")
-        print(f"Created {len(users)} users and {len(users) * 3} demo tasks")
+        print(f"Created {len(users)} users and {task_counter - 1} demo tasks")
+
 
 
 if __name__ == "__main__":

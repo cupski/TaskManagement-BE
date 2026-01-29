@@ -1,5 +1,3 @@
-# app/schemas/common.py
-
 from pydantic import BaseModel
 from typing import Any, Generic, TypeVar
 

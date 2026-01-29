@@ -38,14 +38,8 @@ async def get_users(
         )
 
     query = query.limit(limit)
+
     
-    # Get total count
-    count_query = select(func.count()).select_from(query.subquery())
-    total_result = await db.execute(count_query)
-    total = total_result.scalar()
-    
-    
-    # Execute query
     result = await db.execute(query)
     users = result.scalars().all()
     
@@ -54,40 +48,5 @@ async def get_users(
         success=True,
         data={
             "users": [UserResponse.model_validate(user) for user in users],
-            "metadata": {
-                "limit": limit,
-                "total": total,
-            }
         },
-    )
-
-
-@router.get("/{user_id}", response_model=ApiResponse[UserResponse])
-async def get_user_by_id(
-    user_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Get user by ID
-    
-    - **user_id**: UUID of the user
-    
-    Returns user information
-    """
-    result = await db.execute(
-        select(User).where(User.id == user_id)
-    )
-    user = result.scalar_one_or_none()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-    
-    return ApiResponse(
-        success=True,
-        data=UserResponse.model_validate(user),
-        message="User retrieved successfully"
     )

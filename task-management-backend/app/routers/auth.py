@@ -25,44 +25,46 @@ async def register(
     user_data: UserCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    Register a new user
-    
-    - **email**: User email (must be unique)
-    - **username**: Username
-    - **password**: Password (min 8 characters)
-    - **full_name**: Full name of the user
-    """
-    # Check if email already exists
     result = await db.execute(
-        select(User).where(User.email == user_data.email)
+        select(User).where(
+            or_(
+                User.email == user_data.email,
+                User.username == user_data.username,
+            )
+        )
     )
     existing_user = result.scalar_one_or_none()
-    
+
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered"
-        )
+        if existing_user.email == user_data.email:
+            raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
+        raise HTTPException(status.HTTP_409_CONFLICT, "Username already taken")
     
-    # Create new user
     hashed_password = get_password_hash(user_data.password)
     new_user = User(
         email=user_data.email,
         username=user_data.username,
         password_hash=hashed_password,
         full_name=user_data.full_name,
-        is_active=True
     )
     
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    
+    try:
+        db.add(new_user)
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        raise
+
+
+    result = await db.execute(
+        select(User).where(User.id == new_user.id)
+    )
+    new_user = result.scalar_one()
+
     return ApiResponse(
         success=True,
         data=UserResponse.model_validate(new_user),
-        message="User registered successfully"
+        message="User registered successfully",
     )
 
 
@@ -71,15 +73,6 @@ async def login(
     credentials: UserLogin,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    Login user and return JWT token
-    
-    - **email**: User email
-    - **password**: User password
-    
-    Returns access token and user information
-    """
-    # Get user by email
     result = await db.execute(
         select(User).where(
             or_(
@@ -97,7 +90,6 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Create access token
     access_token = create_token_for_user(user.id, user.email)
     
     return ApiResponse(
