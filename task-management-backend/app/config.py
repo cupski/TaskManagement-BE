@@ -31,13 +31,8 @@ class Settings(BaseSettings):
     PORT: int = 8000
     RELOAD: bool = True
     
-    # AI Chatbot (Optional)
-    ENABLE_AI_CHATBOT: bool = False
-    OPENAI_API_KEY: str | None = None
-    OPENAI_MODEL: str = "gpt-4"
-    GOOGLE_API_KEY: str | None = None
-    OLLAMA_BASE_URL: str | None = None
-    OLLAMA_MODEL: str = "llama2"
+    OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     
     class Config:
         env_file = ".env"

@@ -1,5 +1,3 @@
-# app/main.py
-
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -14,21 +12,17 @@ from app.routers import auth, users, tasks
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Lifespan events for FastAPI application
-    Runs on startup and shutdown
-    """
     # Startup
-    print("🚀 Starting Task Management API...")
-    print(f"📊 Debug mode: {settings.DEBUG}")
-    print(f"🔐 JWT Algorithm: {settings.ALGORITHM}")
+    print(" Starting Task Management API...")
+    print(f" Debug mode: {settings.DEBUG}")
+    print(f" JWT Algorithm: {settings.ALGORITHM}")
     
     # Initialize database
     try:
         await init_db()
-        print("✅ Database initialized successfully")
+        print(" Database initialized successfully")
     except Exception as e:
-        print(f"❌ Database initialization failed: {e}")
+        print(f" Database initialization failed: {e}")
     
     yield
     
@@ -112,7 +106,6 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-# Include routers
 app.include_router(auth.router, prefix=f"/api/{settings.API_VERSION}")
 app.include_router(users.router, prefix=f"/api/{settings.API_VERSION}")
 app.include_router(tasks.router, prefix=f"/api/{settings.API_VERSION}")
@@ -137,46 +130,6 @@ async def root():
         "message": "Task Management API is running"
     }
 
-
-# Health check endpoint
-@app.get("/health", tags=["Health"])
-async def health_check():
-    """
-    Health check endpoint
-    
-    Returns API status and database connectivity
-    """
-    return {
-        "success": True,
-        "data": {
-            "status": "healthy",
-            "database": "connected",
-            "version": settings.API_VERSION
-        },
-        "message": "API is healthy"
-    }
-
-
-# API version endpoint
-@app.get(f"/api/{settings.API_VERSION}", tags=["Root"])
-async def api_info():
-    """
-    API version information
-    """
-    return {
-        "success": True,
-        "data": {
-            "version": settings.API_VERSION,
-            "endpoints": {
-                "auth": f"/api/{settings.API_VERSION}/auth",
-                "users": f"/api/{settings.API_VERSION}/users",
-                "tasks": f"/api/{settings.API_VERSION}/tasks",
-                "chatbot": f"/api/{settings.API_VERSION}/chatbot",
-            },
-            "documentation": "/docs"
-        },
-        "message": f"Task Management API {settings.API_VERSION}"
-    }
 
 
 if __name__ == "__main__":
