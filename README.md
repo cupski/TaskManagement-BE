@@ -4,12 +4,12 @@
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/cupski/TaskManagement.git
+git clone https://github.com/cupski/TaskManagement-BE.git
 ```
 
 ### 2. Masuk ke Folder Backend
 ```bash
-cd TaskManagement/task-management-backend
+cd TaskManagement-BE/task-management-backend
 ```
 
 ### 3. Setup Virtual Environment
