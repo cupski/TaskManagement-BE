@@ -12,29 +12,26 @@ git clone https://github.com/cupski/TaskManagement.git
 cd TaskManagement/task-management-backend
 ```
 
-### 3. Setup Virtual Environment
+### 3. Buat dan Aktifkan Virtual Environment (Disarankan)
 
-#### Jika Menggunakan Windows (venv sudah tersedia)
-
-Langsung aktifkan virtual environment yang sudah ada:
+**Windows:**
 ```bash
+python -m venv venv
 venv\Scripts\activate
 ```
 
-#### Jika Menggunakan OS Lain (Linux/macOS) atau venv tidak kompatibel
-
-Buat virtual environment baru:
+**Linux / macOS:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-Lalu install dependencies secara manual (karena tidak ada `requirements.txt`):
+### 4. Install Dependencies
 ```bash
-pip install fastapi uvicorn python-dotenv sqlalchemy pyjwt passlib python-multipart
+pip install -r requirements.txt
 ```
 
-### 4. Konfigurasi Environment Variable
+### 5. Konfigurasi Environment Variable
 
 Salin file `.env.example` menjadi `.env`:
 ```bash
@@ -46,11 +43,17 @@ cp .env.example .env
 copy .env.example .env
 ```
 
-Sesuaikan isi `.env` dengan konfigurasi database dan secret key.
+Sesuaikan isi `.env` dengan konfigurasi database (Serta buat database "taskmanager_db" terlebih dahulu di lokal) dan secret key.
 
-### 5. Jalankan Server
+### 6. Jalankan Server
+Seeding Database:
 ```bash
-uvicorn app.main:app --reload
+python init-db
+```
+
+---
+```bash
+uvicorn app.main:app --reload --port 8000
 ```
 
 ---
@@ -87,8 +90,8 @@ task-management-backend/
 │  ├─ utils/             # Config, security, dependencies
 │  └─ main.py            # Entry point FastAPI
 ├─ venv/                 # Virtual environment (Windows)
-├─ .env                  # Environment variables
-├─ .env.example
+├─ Requirement.txt       # Dependency with version        
+├─ .env.example          # Environment variables
 ├─ Task_ERD.png          # Diagram ERD (gambar)
 ├─ Task_ERD_dbdiagram.txt # Diagram ERD (sintaks dbdiagram)
 ├─ task-Management-API.postman_collection.json

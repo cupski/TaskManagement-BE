@@ -31,8 +31,6 @@ class Settings(BaseSettings):
     PORT: int = 8000
     RELOAD: bool = True
     
-    OPENAI_API_KEY: str = ""
-    GEMINI_API_KEY: str = ""
     
     class Config:
         env_file = ".env"
